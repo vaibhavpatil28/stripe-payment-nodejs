@@ -8,11 +8,13 @@ const stripe = require('stripe')('sk_test_51HBGdaIikNnb5zwacSJloIxDgS3kUZ');
 
 const route = express.Router();
 
-route.get('/secret', async (req, res) => {
+route.post('/secret', async (req, res) => {
+    console.log('req.body: ', req.body);
+    const paymentDetails = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
-        description: 'Software development services',
+        description: paymentDetails.description,
         shipping: {
-            name: 'Jenny Rosen',
+            name: paymentDetails.name,
             address: {
                 line1: '510 Townsend St',
                 postal_code: '98140',
@@ -21,7 +23,7 @@ route.get('/secret', async (req, res) => {
                 country: 'US',
             },
         },
-        amount: 1099,
+        amount: Math.round(paymentDetails.amount),
         currency: 'usd',
         payment_method_types: ['card'],
         metadata: { integration_check: 'accept_a_payment' },
